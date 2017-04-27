@@ -1,0 +1,17 @@
+# 配置语言及相应版本
+language: node_js
+
+node_js:
+  - "4"
+# 项目所在分支
+branches:
+  only:
+  - master
+# 安装依赖
+install:
+- npm install hexo-cli -g
+- npm install
+
+# 部署的命令
+script:
+- npm run deploy  # hexo clean && hexo g -d
