@@ -11,6 +11,7 @@ install:
 
 script:
   - pwd
+  - ls
   - hexo g
 
 after_script:
