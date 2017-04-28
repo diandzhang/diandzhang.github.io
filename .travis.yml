@@ -14,13 +14,13 @@ cache:
 script:
   - pwd
   - ls -l -a
-  - chmod 777 node_modules
-  - chmod 777 /home/travis/.travis/job_stages
-  - ls -l -a
-  - ls -l -a /home/travis/.travis/
-  - ls -l -a node_modules
+ # - chmod 777 node_modules
+ # - chmod 777 /home/travis/.travis/job_stages
+ # - ls -l -a
+#  - ls -l -a /home/travis/.travis/
+#  - ls -l -a node_modules
   - hexo g
-  - ls 
+  - ls -l -a
 after_script:
   - cd ./public
   - git init
