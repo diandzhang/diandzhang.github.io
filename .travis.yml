@@ -28,3 +28,7 @@ branches:
 env:
  global:
    - GH_REF: github.com/diandzhang/diandzhang.github.io.git
+
+cache:
+  directories:
+    - node_modules
