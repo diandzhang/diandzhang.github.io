@@ -8,7 +8,9 @@ install:
 
 #before_script:
  # - npm install -g gulp
-
+cache:
+  directories:
+    - node_modules
 script:
   - pwd
   - hexo g
@@ -29,7 +31,3 @@ branches:
 env:
  global:
    - GH_REF: github.com/diandzhang/diandzhang.github.io.git
-
-cache:
-  directories:
-    - node_modules
