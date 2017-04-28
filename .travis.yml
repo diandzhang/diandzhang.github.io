@@ -13,8 +13,10 @@ cache:
     - node_modules
 script:
   - pwd
+  - ls
+  - ls -l .\node_modules\
   - hexo g
-
+  - ls
 after_script:
   - cd ./public
   - git init
