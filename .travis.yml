@@ -16,7 +16,8 @@ script:
   - ls -l
   - chmod 777 node_modules
   - chmod 777 /home/travis/.travis/job_stages
-  - ls -l  
+  - ls -l 
+  - ls -l /home/travis/.travis/
   - ls -l node_modules
   - hexo g
   - ls
