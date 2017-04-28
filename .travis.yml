@@ -10,6 +10,7 @@ install:
  # - npm install -g gulp
 
 script:
+  - pwd
   - hexo g
 
 after_script:
