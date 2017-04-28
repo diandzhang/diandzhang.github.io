@@ -13,7 +13,7 @@ script:
   - pwd
   - ls
   - hexo g
-
+  - ls
 after_script:
   - cd ./public
   - git init
