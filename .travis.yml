@@ -12,6 +12,7 @@ install:
 script:
   - pwd
   - ls
+  - ll .\node_modules\.bin
   - hexo g
   - ls
 after_script:
