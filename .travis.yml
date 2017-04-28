@@ -19,7 +19,7 @@ script:
  # - ls -l -a
 #  - ls -l -a /home/travis/.travis/
 #  - ls -l -a node_modules
-  - hexo g
+  - hexo g --debug
   - ls -l -a
 after_script:
   - cd ./public
