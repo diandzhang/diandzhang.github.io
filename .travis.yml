@@ -14,7 +14,7 @@ cache:
 script:
   - pwd
   - ls
-  - ls -l .\node_modules\
+  - ls -l
   - hexo g
   - ls
 after_script:
