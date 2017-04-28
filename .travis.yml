@@ -19,7 +19,7 @@ script:
  # - ls -l -a
 #  - ls -l -a /home/travis/.travis/
 #  - ls -l -a node_modules
-  - cat /home/travis/.travis/job_stages
+  
   - hexo g
   - ls -l -a
 after_script:
