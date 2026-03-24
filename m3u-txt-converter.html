@@ -2,319 +2,168 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>在线格式转换工具 (TXT <-> M3U) - diandzhang</title>
-  <meta name="description" content="一个简单的在线双向转换工具，支持TXT转M3U和M3U转TXT，纯前端处理，安全不偷源。">
-  <meta name="keywords" content="txt转m3u,m3u转txt,m3u生成,直播源转换,diandzhang">
+  <title>IPTV 高级工具 - 转换/过滤/生成</title>
   <style>
-    body {
-      text-align: center;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    h2 { color: #333; margin-bottom: 10px; }
-    
-    /* 选项卡样式 */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #ddd;
-    }
-    .tab-btn {
-      padding: 12px 24px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-      color: #666;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s;
-    }
-    .tab-btn.active {
-      color: #4CAF50;
-      border-bottom: 3px solid #4CAF50;
-    }
-    .tab-btn:hover { color: #45a049; }
-
-    /* 内容区域 */
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      display: none; /* 默认隐藏，由JS控制显示 */
-    }
+    body { font-family: 'Segoe UI', Arial; background: #eee; margin: 0; padding: 10px; font-size: 13px; overflow: hidden; height: 100vh; }
+    h2 { margin: 2px 0; font-size: 16px; display: inline-block; }
+    .filter-bar { background: #fff3e0; padding: 5px 10px; margin-bottom: 5px; display: flex; align-items: center; border-radius: 4px; border: 1px solid #ffcc80; }
+    .filter-bar select { padding: 3px; margin-right: 5px; cursor: pointer; border-radius: 3px; }
+    .filter-bar input { flex: 1; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
+    .tabs { display: flex; justify-content: center; margin-bottom: 5px; }
+    .tab-btn { padding: 6px 20px; cursor: pointer; border: 1px solid #ccc; background: #ddd; border-bottom: none; border-radius: 4px 4px 0 0; }
+    .tab-btn.active { background: #4CAF50; color: white; border-color: #4CAF50; }
+    .container { max-width: 1100px; margin: 0 auto; background: white; padding: 8px; border-radius: 5px; display: none; height: 80vh; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .container.active { display: block; }
-
-    textarea {
-      width: 100%;
-      height: 300px;
-      box-sizing: border-box;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 13px;
-      font-family: monospace;
-      resize: vertical;
-    }
-    
-    .output-area {
-      background-color: #fafafa;
-      color: #333;
-    }
-
-    .btn-group {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 14px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      transition: background 0.2s;
-    }
-    button:hover { background-color: #45a049; }
-    button.secondary { background-color: #2196F3; }
-    button.secondary:hover { background-color: #1976D2; }
-    button.danger { background-color: #f44336; }
-    button.danger:hover { background-color: #d32f2f; }
-
-    /* 文件上传区域 */
-    .file-upload {
-      margin: 15px 0;
-      padding: 15px;
-      border: 2px dashed #ccc;
-      border-radius: 5px;
-      background: #f9f9f9;
-    }
-    .file-upload:hover { border-color: #4CAF50; background: #f0fff0; }
-    
-    #copyright {
-      margin-top: 30px;
-      color: #888;
-      font-size: 12px;
-    }
-    
-    label { display: block; margin-bottom: 5px; font-weight: bold; text-align: left; }
-    .hint { font-size: 12px; color: #666; text-align: left; margin-top: 5px; }
+    textarea { width: 100%; height: calc(42% - 15px); box-sizing: border-box; margin-top: 5px; font-family: 'Consolas', monospace; font-size: 11px; resize: none; border: 1px solid #ddd; }
+    .btn-group { margin: 4px 0; display: flex; gap: 8px; justify-content: center; align-items: center; }
+    button { padding: 5px 15px; cursor: pointer; border-radius: 3px; border: none; background: #4CAF50; color: white; font-weight: bold; }
+    .secondary { background: #2196F3; } .danger { background: #f44336; }
+    .gen-input { padding: 4px; border: 1px solid #ccc; width: 60px; border-radius: 3px; }
+    #stats { font-size: 11px; color: #666; text-align: right; }
   </style>
 </head>
 <body>
 
-  <h2>在线直播源格式转换工具</h2>
-  
-  <!-- 选项卡 -->
+  <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 5px;">
+    <h2>📡 IPTV 综合处理中心</h2>
+    <div id="stats">准备就绪</div>
+  </div>
+
+  <div class="filter-bar">
+    <select id="filterMode">
+      <option value="exclude">🚫 排除 (黑名单)</option>
+      <option value="include">✅ 包含 (白名单)</option>
+    </select>
+    <input type="text" id="filterKeywords" placeholder="过滤关键字 (多个用逗号隔开)">
+  </div>
+
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('txt2m3u')">TXT 转 M3U</button>
-    <button class="tab-btn" onclick="switchTab('m3u2txt')">M3U 转 TXT</button>
+    <button class="tab-btn active" onclick="switchTab('txt2m3u')">TXT -> M3U</button>
+    <button class="tab-btn" onclick="switchTab('m3u2txt')">M3U -> TXT</button>
+    <button class="tab-btn" onclick="switchTab('generator')" style="background:#673AB7; color:white;">⚡ 批量生成地址</button>
   </div>
 
-  <!-- 模式 1: TXT 转 M3U -->
   <div id="tab-txt2m3u" class="container active">
-    <h3>步骤 1: 输入 TXT 格式源</h3>
-    <div class="hint">格式示例：<br>央视,#genre#<br>CCTV-1,http://example.com/cctv1.m3u8<br>湖南卫视,http://example.com/hunan.m3u8</div>
-    <textarea id="txtInput" placeholder="在此粘贴 TXT 内容..."></textarea>
-    
-    <div class="btn-group">
-      <button onclick="convertToM3U()">开始转换</button>
-      <button class="danger" onclick="clearScreen('txt')">清除输入</button>
-    </div>
-
-    <h3>步骤 2: M3U 转换结果</h3>
-    <textarea id="m3uOutput" class="output-area" readonly placeholder="转换结果将显示在这里..."></textarea>
-    
-    <div class="btn-group">
-      <button class="secondary" onclick="copyContent('m3uOutput')">拷贝结果</button>
-      <button class="secondary" onclick="saveAsFile('m3uOutput', 'playlist.m3u')">保存为 .m3u</button>
-    </div>
+    <textarea id="txtInput" placeholder="频道名,url"></textarea>
+    <div class="btn-group"><button onclick="doConvert('txt2m3u')">开始转换</button><button class="danger" onclick="clearTxt('txtInput')">清空</button></div>
+    <textarea id="m3uOutput" readonly></textarea>
+    <div class="btn-group"><button class="secondary" onclick="copyIt('m3uOutput')">拷贝</button><button class="secondary" onclick="saveFile('m3uOutput', 'list.m3u')">保存</button></div>
   </div>
 
-  <!-- 模式 2: M3U 转 TXT -->
   <div id="tab-m3u2txt" class="container">
-    <h3>步骤 1: 输入 M3U 内容</h3>
-    <div class="file-upload">
-      <label for="m3uFileInput" style="text-align: center; cursor: pointer; color: #2196F3;">
-        📁 点击选择 .m3u 或 .m3u8 文件
-      </label>
-      <input type="file" id="m3uFileInput" accept=".m3u,.m3u8" style="display: none;" onchange="handleFileSelect(this)">
-      <div id="fileNameDisplay" style="margin-top: 5px; font-size: 12px; color: #666;"></div>
-    </div>
-    <div class="hint">或者直接在下方文本框粘贴 M3U 内容：</div>
-    <textarea id="m3uInput" placeholder="#EXTM3U..."></textarea>
-
-    <div class="btn-group">
-      <button onclick="convertToTXT()">开始转换</button>
-      <button class="danger" onclick="clearScreen('m3u')">清除输入</button>
-    </div>
-
-    <h3>步骤 2: TXT 转换结果</h3>
-    <textarea id="txtOutput" class="output-area" readonly placeholder="转换结果将显示在这里..."></textarea>
-    
-    <div class="btn-group">
-      <button class="secondary" onclick="copyContent('txtOutput')">拷贝结果</button>
-      <button class="secondary" onclick="saveAsFile('txtOutput', 'playlist.txt')">保存为 .txt</button>
-    </div>
+    <div style="margin-bottom:5px;"><input type="file" accept=".m3u,.m3u8" onchange="loadFile(this, 'm3uInput')"></div>
+    <textarea id="m3uInput" placeholder="粘贴 M3U 内容..."></textarea>
+    <div class="btn-group"><button onclick="doConvert('m3u2txt')">开始转换</button><button class="danger" onclick="clearTxt('m3uInput')">清空</button></div>
+    <textarea id="txtOutput" readonly></textarea>
+    <div class="btn-group"><button class="secondary" onclick="copyIt('txtOutput')">拷贝</button><button class="secondary" onclick="saveFile('txtOutput', 'list.txt')">保存</button></div>
   </div>
 
-  <div id="copyright">
-    <p>© 2024 diandzhang.github.io All Rights Reserved.</p>
+  <div id="tab-generator" class="container">
+    <div style="background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="margin:0 0 10px 0;"><b>模板说明：</b>使用 <code>[ID]</code> 作为序号占位符</p>
+        <div class="btn-group" style="justify-content: flex-start;">
+            标题: <input type="text" id="genTitle" value="未知台" class="gen-input" style="width:80px;">
+            范围: <input type="number" id="genStart" value="0" class="gen-input"> 到 
+            <input type="number" id="genEnd" value="100" class="gen-input">
+        </div>
+        <div style="margin-top:10px;">
+            地址模板: <input type="text" id="genTpl" style="width:70%; padding:4px;" value="http://XXX.XXX.XXX.XXX:3333/hls/[ID]/index.m3u8">
+            <button onclick="generateUrls()" style="background:#673AB7;">点击生成</button>
+        </div>
+    </div>
+    <textarea id="genOutput" style="height: calc(70% - 15px);" placeholder="生成的 TXT 格式列表..."></textarea>
+    <div class="btn-group">
+        <button class="secondary" onclick="copyIt('genOutput')">拷贝结果</button>
+        <button class="secondary" onclick="saveFile('genOutput', 'generated_scan.txt')">保存为待测列表</button>
+    </div>
   </div>
 
   <script>
-    // --- 界面控制逻辑 ---
-    function switchTab(tabName) {
-      document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-      const btns = document.querySelectorAll('.tab-btn');
-      if(tabName === 'txt2m3u') btns[0].classList.add('active');
-      else btns[1].classList.add('active');
+    function switchTab(t) {
+      document.querySelectorAll('.container, .tab-btn').forEach(e => e.classList.remove('active'));
+      document.getElementById(`tab-${t}`).classList.add('active');
+      event.currentTarget.classList.add('active');
     }
 
-    function clearScreen(mode) {
-      if (mode === 'txt') {
-        document.getElementById('txtInput').value = '';
-        document.getElementById('m3uOutput').value = '';
+    // 核心逻辑：生成 IPTV 地址
+    function generateUrls() {
+        const title = document.getElementById('genTitle').value;
+        const start = parseInt(document.getElementById('genStart').value);
+        const end = parseInt(document.getElementById('genEnd').value);
+        const tpl = document.getElementById('genTpl').value;
+        
+        if (isNaN(start) || isNaN(end) || !tpl.includes('[ID]')) {
+            alert("请确保范围是数字，且模板包含 [ID]");
+            return;
+        }
+
+        let res = "";
+        let count = 0;
+        for (let i = start; i <= end; i++) {
+            const url = tpl.replace('[ID]', i);
+            res += `${title}_${i},${url}\n`;
+            count++;
+        }
+        document.getElementById('genOutput').value = res;
+        document.getElementById('stats').innerText = `⚡ 已生成 ${count} 条地址`;
+    }
+
+    function shouldPass(url, keywords, mode) {
+      if (keywords.length === 0) return true;
+      const hit = keywords.some(k => url.includes(k));
+      return mode === 'exclude' ? !hit : hit;
+    }
+
+    function doConvert(type) {
+      const mode = document.getElementById('filterMode').value;
+      const keywords = document.getElementById('filterKeywords').value.split(',').map(k => k.trim()).filter(k => k);
+      let count = 0, skip = 0;
+
+      if (type === 'txt2m3u') {
+        const input = document.getElementById('txtInput').value;
+        let out = '#EXTM3U\n';
+        input.split('\n').forEach(line => {
+          if (line.includes(',') && !line.includes('#genre#')) {
+            const [name, url] = line.split(',');
+            if (url && shouldPass(url, keywords, mode)) {
+              out += `#EXTINF:-1,${name.trim()}\n${url.trim()}\n`;
+              count++;
+            } else { skip++; }
+          }
+        });
+        document.getElementById('m3uOutput').value = out;
       } else {
-        document.getElementById('m3uInput').value = '';
-        document.getElementById('txtOutput').value = '';
-        document.getElementById('m3uFileInput').value = '';
-        document.getElementById('fileNameDisplay').textContent = '';
-      }
-    }
-
-    function copyContent(elementId) {
-      const el = document.getElementById(elementId);
-      if (!el.value) { alert('内容为空！'); return; }
-      el.select();
-      document.execCommand('copy');
-      alert('内容已复制到剪贴板！');
-    }
-
-    function saveAsFile(elementId, filename) {
-      const content = document.getElementById(elementId).value;
-      if (!content) { alert('没有可保存的内容！'); return; }
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-    }
-
-    // --- 功能逻辑 1: TXT 转 M3U ---
-    function convertToM3U() {
-      const txtInput = document.getElementById('txtInput').value;
-      if (!txtInput.trim()) { alert('请输入 TXT 内容'); return; }
-
-      const lines = txtInput.split('\n');
-      let m3uOutput = '#EXTM3U x-tvg-url="https://live.fanmingming.com/e.xml"\n';
-      let currentGroup = null;
-
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine !== '') {
-          if (trimmedLine.includes('#genre#')) {
-            currentGroup = trimmedLine.replace(/,#genre#/, '').trim();
-          } else if (trimmedLine.includes(',')) {
-            const parts = trimmedLine.split(',');
-            const channelLink = parts.pop().trim();
-            const originalChannelName = parts.join(',').trim();
-            
-            const processedChannelName = originalChannelName.replace(/(CCTV|CETV)-(\d+).*/, '$1$2');
-            
-            m3uOutput += `#EXTINF:-1 tvg-name="${processedChannelName}" tvg-logo="https://live.fanmingming.com/tv/${processedChannelName}.png"`;
-            
-            if (currentGroup) {
-              m3uOutput += ` group-title="${currentGroup}"`;
-            }
-            m3uOutput += `,${originalChannelName}\n${channelLink}\n`;
+        const input = document.getElementById('m3uInput').value;
+        let out = '', tempName = '', curGrp = '未分类', lastGrp = '';
+        input.split('\n').forEach(line => {
+          line = line.trim();
+          if (line.startsWith('#EXTINF:')) {
+            const g = line.match(/group-title="([^"]*)"/);
+            curGrp = g ? g[1] : '未分类';
+            tempName = line.split(',').pop();
+          } else if (line.startsWith('http')) {
+            if (shouldPass(line, keywords, mode)) {
+              if (curGrp !== lastGrp) { out += `${curGrp},#genre#\n`; lastGrp = curGrp; }
+              out += `${tempName},${line}\n`;
+              count++;
+            } else { skip++; }
           }
-        }
+        });
+        document.getElementById('txtOutput').value = out;
       }
-      document.getElementById('m3uOutput').value = m3uOutput;
+      document.getElementById('stats').innerText = `✅ 完成: ${count} | ⏭️ 跳过: ${skip}`;
     }
 
-    // --- 功能逻辑 2: M3U 转 TXT ---
-    
-    function handleFileSelect(input) {
-      const file = input.files[0];
-      if (!file) return;
-      
-      document.getElementById('fileNameDisplay').textContent = `已加载文件：${file.name}`;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('m3uInput').value = e.target.result;
-      };
-      reader.readAsText(file);
+    function loadFile(i, targetId) {
+      const r = new FileReader();
+      r.onload = e => { document.getElementById(targetId).value = e.target.result; };
+      r.readAsText(i.files[0]);
     }
-
-    function convertToTXT() {
-      const m3uInput = document.getElementById('m3uInput').value;
-      if (!m3uInput.trim()) { alert('请输入或上传 M3U 内容'); return; }
-
-      const lines = m3uInput.split(/\r?\n/);
-      let txtOutput = '';
-      let currentGroup = '未分类';
-      let lastGroupName = null; 
-
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
-        if (!line) continue;
-
-        if (line.startsWith('#EXTINF:')) {
-          const groupMatch = line.match(/group-title="([^"]*)"/);
-          if (groupMatch && groupMatch[1]) {
-            currentGroup = groupMatch[1].trim();
-          } else {
-            currentGroup = '未分类';
-          }
-          
-          if (currentGroup !== lastGroupName) {
-            txtOutput += `${currentGroup},#genre#\n`;
-            lastGroupName = currentGroup;
-          }
-
-          const nameParts = line.split(',');
-          let channelName = nameParts.length > 1 ? nameParts.slice(1).join(',').trim() : '未知频道';
-          
-          window.tempChannelName = channelName; 
-          
-        } else if (!line.startsWith('#')) {
-          const channelLink = line;
-          const channelName = window.tempChannelName || '未知频道';
-          
-          txtOutput += `${channelName},${channelLink}\n`;
-          window.tempChannelName = null; 
-        }
-      }
-
-      if (txtOutput.trim() === '') {
-        alert('未能解析出有效内容，请检查 M3U 格式是否正确。');
-        return;
-      }
-
-      document.getElementById('txtOutput').value = txtOutput;
+    function copyIt(id) { document.getElementById(id).select(); document.execCommand('copy'); }
+    function clearTxt(id) { document.getElementById(id).value = ''; }
+    function saveFile(id, n) {
+      const b = new Blob([document.getElementById(id).value], {type:'text/plain'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = n; a.click();
     }
   </script>
 </body>
